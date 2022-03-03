@@ -1,7 +1,19 @@
 using API.Data;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+
+var MyCorsPolicity = "_myCorsPolicity";
 
 var builder = WebApplication.CreateBuilder(args);
+
+//Add CorsPolicies
+builder.Services.AddCors(options =>{
+    options.AddPolicy(name: MyCorsPolicity, 
+                                builder => {
+                                    builder.WithOrigins("http://localhost:3000");
+                                });
+});
 
 // Add services to the container.
 
@@ -25,9 +37,17 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseRouting();
+
+app.UseCors();
+
 app.UseAuthorization();
 
-app.MapControllers();
+//app.MapControllers();
+
+app.UseEndpoints(endpoints =>{
+    endpoints.MapControllers().RequireCors(MyCorsPolicity);
+});
 
 /*
     Todo este código sirve para inicializar los datos de prueba,
